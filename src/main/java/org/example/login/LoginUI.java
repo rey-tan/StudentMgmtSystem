@@ -1,0 +1,88 @@
+package org.example.login;
+
+import net.miginfocom.swing.MigLayout;
+import org.example.dashboard.DashboardUI;
+import org.example.student.ui.StudentTable;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
+
+public class LoginUI extends JPanel {
+
+    LoginService loginService;
+
+    JFrame parentFrame;
+    JTextField name;
+    JPasswordField pwd;
+    JLabel nameLabel, pwdLabel, createAccountLabel;
+    JButton loginBtn;
+
+    public
+    LoginUI(JFrame parentFrame) {
+        parentFrame.setJMenuBar(null);
+        loginService = LoginService.getLoginService();
+        this.parentFrame = parentFrame;
+
+        setLayout(new MigLayout());
+
+        JLabel title = new JLabel("Login");
+        title.setFont(new Font("Arial", Font.BOLD, 24));
+
+
+        nameLabel = new JLabel("Name:");
+        name = new JTextField(15);
+
+        pwdLabel = new JLabel("Password:");
+        pwd = new JPasswordField(15);
+
+        loginBtn = new JButton("Login");
+        loginBtn.addActionListener((e) ->
+        {
+            String inputName = name.getText();
+            String inputPwd = new String(pwd.getPassword());
+
+            if(loginService.login(inputName, inputPwd)) {
+                switchToStudentTable();
+            } else {
+                // Show error message
+                JOptionPane.showMessageDialog(this,
+                    "Invalid username or password!",
+                    "Login Failed",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+
+        });
+
+        createAccountLabel = new JLabel("No Account? Click here to register");
+        createAccountLabel.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                new RegisterAccount(parentFrame);
+                System.out.println("clicked");
+            }
+        });
+
+        add(title, "span, align center, wrap");
+
+        add(nameLabel);
+        add(name, "wrap");
+
+        add(pwdLabel);
+        add(pwd, "wrap");
+
+        add(loginBtn, "wrap, cell 1 3, growx");
+        add(createAccountLabel, "wrap, cell 1 3, growx");
+    }
+
+    private void switchToStudentTable() {
+        parentFrame.getContentPane().removeAll();
+        parentFrame.setSize(1200,800);
+        parentFrame.setLocationRelativeTo(null);
+        parentFrame.add(new StudentTable(parentFrame));
+        parentFrame.revalidate();
+        parentFrame.repaint();
+    }
+
+}
